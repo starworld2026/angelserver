@@ -27,7 +27,7 @@
         "wrangler": "^4.149.0"
     },
     "engines": {
-        "node": ">=14.x"
+        "node": ">=22.x"
     },
     "license": "MIT"
 }
