@@ -5,6 +5,7 @@ const { initializeApp } = require("firebase/app");
 const { getFirestore } = require("firebase/firestore");
 const apiRoutes = require("./routes/apiRoutes");
 const firebaseConfig = require("./models/firebaseConfig");
+import { httpServerHandler } from "cloudflare:node";
 
 const app = express();
 const port = process.env.PORT || 4000;
@@ -33,3 +34,5 @@ try {
 app.listen(port, () => {
   console.log(`Listening on port ${port}`);
 });
+
+export default httpServerHandler({ port });
