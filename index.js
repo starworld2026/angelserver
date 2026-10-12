@@ -1,38 +1,35 @@
-const express = require("express");
-const cors = require("cors");
-const requestIp = require("request-ip");
-const { initializeApp } = require("firebase/app");
-const { getFirestore } = require("firebase/firestore");
-const apiRoutes = require("./routes/apiRoutes");
-const firebaseConfig = require("./models/firebaseConfig");
+
+import express from "express";
+import cors from "cors";
 import { httpServerHandler } from "cloudflare:node";
+import { initializeApp, getApps } from "firebase/app";
+import { getFirestore } from "firebase/firestore";
+
+import apiRoutes from "./routes/apiRoutes.js";
+import firebaseConfig from "./models/firebaseConfig.js";
 
 const app = express();
-const port = process.env.PORT || 4000;
+const port = 3000;
 
 app.set("trust proxy", true);
 
-// Enable CORS for all requests
 app.use(cors());
-
-// Middleware to extract client's IP
-app.use(requestIp.mw());
-
-// Middleware to parse JSON requests
 app.use(express.json());
 app.use(express.static("public"));
-try {
-  const firebaseApp = initializeApp(firebaseConfig);
-  const db = getFirestore(firebaseApp);
-  console.log("Firebase initialized successfully");
-  app.use(apiRoutes(db));
-} catch (error) {
-  console.error("Error initializing Firebase:", error);
-}
-// Routes
 
-app.listen(port, () => {
-  console.log(`Listening on port ${port}`);
+const firebaseApp =
+  getApps().length > 0
+    ? getApps()[0]
+    : initializeApp(firebaseConfig);
+
+const db = getFirestore(firebaseApp);
+
+app.use(apiRoutes(db));
+
+app.get("/", (req, res) => {
+  res.json({ message: "API is running on Cloudflare Workers" });
 });
+
+app.listen(port);
 
 export default httpServerHandler({ port });
